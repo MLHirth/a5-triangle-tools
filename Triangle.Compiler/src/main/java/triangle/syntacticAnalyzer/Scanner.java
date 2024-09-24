@@ -39,7 +39,7 @@ public final class Scanner {
 
 	private boolean isOperator(char c) {
 		return (c == '+' || c == '-' || c == '*' || c == '/' || c == '=' || c == '<' || c == '>' || c == '\\'
-				|| c == '&' || c == '@' || c == '%' || c == '^' || c == '?');
+				|| c == '&' || c == '@' || c == '%' || c == '^' || c == '?' || c == '|');
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -67,25 +67,50 @@ public final class Scanner {
 
 	private void scanSeparator() {
 		switch (currentChar) {
-		
 		// comment
-		case '!': 
-			takeIt();
-			
-			// the comment ends when we reach an end-of-line (EOL) or end of file (EOT - for end-of-transmission)
-			while ((currentChar != SourceFile.EOL) && (currentChar != SourceFile.EOT))
+			case '!':
 				takeIt();
-			if (currentChar == SourceFile.EOL)
-				takeIt();
-			break;
 
-		// whitespace
-		case ' ':
-		case '\n':
-		case '\r':
-		case '\t':
-			takeIt();
-			break;
+				// the comment ends when we reach an end-of-line (EOL) or end of file (EOT - for end-of-transmission)
+				while ((currentChar != SourceFile.EOL) && (currentChar != SourceFile.EOT))
+					takeIt();
+				if (currentChar == SourceFile.EOL)
+					takeIt();
+				break;
+
+			// whitespace
+			case '#':
+				takeIt();
+
+				// the comment ends when we reach an end-of-line (EOL) or end of file (EOT - for end-of-transmission)
+				while ((currentChar != SourceFile.EOL) && (currentChar != SourceFile.EOT))
+					takeIt();
+				if (currentChar == SourceFile.EOL)
+					takeIt();
+				break;
+			case '$':
+				takeIt();  // Consume the starting '$'
+
+				// The comment ends when we reach another '$' or EOT (End-of-Transmission)
+				while ((currentChar != SourceFile.EOT)) {
+					if (currentChar == '$') {
+						// End of comment, so consume the closing '$'
+						takeIt();
+						break;  // Exit the loop once we find the closing $
+					} else if (currentChar == SourceFile.EOL) {
+						// Handle line breaks within the comment (optional)
+						takeIt();  // Consume EOL to keep reading multi-line comments
+					} else {
+						takeIt();  // Continue consuming characters in the comment
+					}
+				}
+				break;
+			case ' ':
+			case '\n':
+			case '\r':
+			case '\t':
+				takeIt();
+				break;
 		}
 	}
 
@@ -177,6 +202,7 @@ public final class Scanner {
 		case '@':
 		case '%':
 		case '^':
+			case '|':
 		case '?':
 			takeIt();
 			while (isOperator(currentChar))
@@ -257,7 +283,7 @@ public final class Scanner {
 		currentlyScanningToken = false;
 		// skip any whitespace or comments
 		while (currentChar == '!' || currentChar == ' ' || currentChar == '\n' || currentChar == '\r'
-				|| currentChar == '\t')
+				|| currentChar == '\t' || currentChar == '#' || currentChar == '$')
 			scanSeparator();
 
 		currentlyScanningToken = true;

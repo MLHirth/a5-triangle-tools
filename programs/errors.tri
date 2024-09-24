@@ -1,30 +1,30 @@
-! Program with a variety of contextual errors.
-
 let
   type String ~ array 4 of Char;
   type Name ~ array 3 of String;
-  type Rec ~ record x: Integer, x: Integer end;
+  type Rec ~ record y: Integer, z: Integer end;
 
   var me: Name;
-  var silly : maxint;
   var silly: Rec;
 
-  proc putstr (s: String) ~
+  proc putstr (var s: String) ~
     let var i: Integer
     in
       begin
-      s[4] := ' ';
-      i := 0;
-      while i do
-        begin i := i+true;
-              put (s[\i])
-        end
+        s[3] := ' ';
+        i := 0;
+        while i < 4 do
+          begin
+            put(s[i]);
+            i := i + 1;
+          end
       end
-    
+
 in
   begin
-  me[true] := ['T','i','n','y'];
-  me[2][2] := 0;
-  put (me[1]); put (4); put ();
-  putstr (initials (me)); puteol ()
+    me[0] := ['T', 'i', 'n', 'y'];
+    me[1][2] := '0';
+    putstr(var me[0]);
+    putint(4);
+    puteol();
   end
+
