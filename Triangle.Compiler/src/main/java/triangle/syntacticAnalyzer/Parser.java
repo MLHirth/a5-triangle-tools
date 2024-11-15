@@ -1,8 +1,8 @@
 /*
- * @(#)Parser.java                       
- * 
+ * @(#)Parser.java
+ *
  * Revisions and updates (c) 2022-2024 Sandy Brownlee. alexander.brownlee@stir.ac.uk
- * 
+ *
  * Original release:
  *
  * Copyright (C) 1999, 2003 D.A. Watt and D.F. Brown
@@ -115,7 +115,7 @@ public class Parser {
 
 	// acceptIt simply moves to the next token with no checking
 	// (used where we've already done the check)
-	
+
 	void acceptIt() {
 		previousTokenPosition = currentToken.position;
 		currentToken = lexicalAnalyser.scan();
@@ -292,10 +292,22 @@ public class Parser {
 			} else {
 
 				Vname vAST = parseRestOfVname(iAST);
-				accept(Token.Kind.BECOMES);
-				Expression eAST = parseExpression();
-				finish(commandPos);
-				commandAST = new AssignCommand(vAST, eAST, commandPos);
+                if (currentToken.kind == Token.Kind.OPERATOR && currentToken.spelling.equals("++")) {
+                    acceptIt();
+                    IntegerLiteral il = new IntegerLiteral("1", commandPos);
+                    IntegerExpression ie = new IntegerExpression(il, commandPos);
+                    VnameExpression vne = new VnameExpression(vAST, commandPos);
+                    Operator op = new Operator("+", commandPos);
+                    Expression eAST = new BinaryExpression(vne, op, ie, commandPos);
+                    finish(commandPos);
+                    commandAST = new AssignCommand(vAST, eAST, commandPos);
+                } else {
+
+                    accept(Token.Kind.BECOMES);
+                    Expression eAST = parseExpression();
+                    finish(commandPos);
+                    commandAST = new AssignCommand(vAST, eAST, commandPos);
+                }
 			}
 		}
 			break;

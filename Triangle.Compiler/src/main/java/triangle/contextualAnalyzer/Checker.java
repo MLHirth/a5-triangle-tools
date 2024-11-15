@@ -967,5 +967,9 @@ public final class Checker implements ActualParameterVisitor<FormalParameter, Vo
 		StdEnvironment.unequalDecl = declareStdBinaryOp("\\=", StdEnvironment.anyType, StdEnvironment.anyType,
 				StdEnvironment.booleanType);
 
+		// | operator
+		StdEnvironment.barDecl = declareStdUnaryOp("|", StdEnvironment.integerType, StdEnvironment.integerType);
+
 	}
 }
+
